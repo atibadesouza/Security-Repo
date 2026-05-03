@@ -22,9 +22,14 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// ADAPT: replace with your project's slug-prefixed table name.
-// Example: const RATE_LIMITS_TABLE = "rcv_rate_limits";
-const RATE_LIMITS_TABLE = "rate_limits";
+// Resolved at runtime from the RATE_LIMITS_TABLE env var so this file is
+// PROJECT-AGNOSTIC. The Seed generator creates `<slug>_rate_limits` and
+// claude.md Setup Sequence exports `RATE_LIMITS_TABLE=<slug>_rate_limits`
+// alongside the standard Supabase secrets. Fallback `"rate_limits"` is the
+// pre-prefix legacy name — only used if the env var was forgotten, and
+// every call will fail-open with a console.warn pointing here.
+const RATE_LIMITS_TABLE =
+  Deno.env.get("RATE_LIMITS_TABLE") ?? "rate_limits";
 
 export type RateLimitTier = "auth" | "read" | "write" | "expensive";
 
