@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Security-Repo//Fixture//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:fixture-event-001@security-repo
+DTSTAMP:20260508T120000Z
+DTSTART:20260601T150000Z
+DTEND:20260601T160000Z
+SUMMARY:Fixture meeting — used by upload tests
+DESCRIPTION:This event exists only as a Playwright fixture for ICS upload specs.
+LOCATION:Test Workspace
+END:VEVENT
+END:VCALENDAR
