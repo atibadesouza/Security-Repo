@@ -10,10 +10,16 @@
 // - Catches payload bloat before it hits the DB
 // - Makes your function's contract explicit and self-documenting
 //
+// CORS contract: every Response built here attaches corsHeaders(req). A 400
+// or 413 without CORS shows up to the browser as an opaque "Network Error"
+// — the actual status code is invisible to the caller. If you add a new
+// error path, attach corsHeaders.
+//
 // Install: Zod is available via esm.sh for Deno Edge Functions.
 // =============================================================================
 
 import { z, ZodSchema, ZodError } from "https://esm.sh/zod@3.23.8";
+import { corsHeaders } from "./cors.ts";
 
 // Re-export z so functions can define schemas without a separate import
 export { z };
@@ -50,7 +56,7 @@ export async function validateBody<T>(
       null,
       new Response(JSON.stringify({ error: "Request body too large" }), {
         status: 413,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }),
     ];
   }
@@ -64,7 +70,7 @@ export async function validateBody<T>(
         null,
         new Response(JSON.stringify({ error: "Request body too large" }), {
           status: 413,
-          headers: { "Content-Type": "application/json" },
+          headers: { ...corsHeaders(req), "Content-Type": "application/json" },
         }),
       ];
     }
@@ -74,7 +80,7 @@ export async function validateBody<T>(
       null,
       new Response(JSON.stringify({ error: "Invalid JSON in request body" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }),
     ];
   }
@@ -101,7 +107,7 @@ export async function validateBody<T>(
           }),
           {
             status: 400,
-            headers: { "Content-Type": "application/json" },
+            headers: { ...corsHeaders(req), "Content-Type": "application/json" },
           }
         ),
       ];
@@ -111,7 +117,7 @@ export async function validateBody<T>(
       null,
       new Response(JSON.stringify({ error: "Validation error" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }),
     ];
   }
@@ -153,7 +159,7 @@ export function validateParams<T>(
           JSON.stringify({ error: "Invalid query parameters", details: issues }),
           {
             status: 400,
-            headers: { "Content-Type": "application/json" },
+            headers: { ...corsHeaders(req), "Content-Type": "application/json" },
           }
         ),
       ];
@@ -163,7 +169,7 @@ export function validateParams<T>(
       null,
       new Response(JSON.stringify({ error: "Parameter validation error" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }),
     ];
   }

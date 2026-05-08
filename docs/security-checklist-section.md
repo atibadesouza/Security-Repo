@@ -9,6 +9,9 @@
 - [ ] ⚙️ Security templates repo cloned and integrated per README
 - [ ] 👁️ Supabase Auth configured: signup enabled/disabled as specified in Security Architecture
 - [ ] 👁️ `.env.example` created with placeholder values (no real keys)
+- [ ] ⚙️ `RATE_LIMITS_TABLE=<prefix>_rate_limits` is in `.env.example` and Supabase secrets — `_shared/rate-limit.ts` throws at startup if unset (no silent fail-open)
+- [ ] ⚙️ Browser code uses `createBrowserClient` from `@supabase/ssr` (cookie-based) — never `createClient` from `@supabase/supabase-js` directly
+- [ ] ⚙️ Server Actions / Route Handlers / Server Components invoke edge functions through `serverApiCall` — never the browser `apiCall`
 - [ ] ⚙️ `.gitignore` includes `.env*` patterns
 - [ ] ⚙️ CI pipeline (`github-actions.yml`) configured and passing
 - [ ] ⚙️ Pre-commit hook installed
@@ -31,6 +34,8 @@
 - [ ] ⚙️ Uses `safeError()` — no raw DB errors returned to client
 - [ ] ⚙️ Uses `corsHeaders()` — CORS restricted to allowed origins
 - [ ] ⚙️ Wrapped in `withErrorHandler()` — unhandled errors caught
+- [ ] ⚙️ Every error `Response` (in `_shared/*.ts` and the function body) attaches `corsHeaders(req)` — opaque "Network Error" in the browser is the symptom of a missing CORS header
+- [ ] ⚙️ Functions that create or update long-running records call `checkIdempotency()` — return stored result on completed, 409 on in-progress, never a placeholder string
 - [ ] 👁️ No `user_id` accepted from request body or query params
 - [ ] 👁️ Response only includes fields the client needs
 

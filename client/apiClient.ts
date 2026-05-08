@@ -1,12 +1,17 @@
 // =============================================================================
-// API CLIENT — wrapper for invoking edge functions from the Service layer
+// BROWSER API CLIENT — for invoking edge functions from Client Components
 // =============================================================================
-// Attaches the user's JWT, handles 401-with-refresh, parses sanitized errors,
-// and returns a typed result. Never call edge functions with raw `fetch` from
-// the browser — always go through this wrapper so the auth + retry behavior
-// is consistent.
+// BROWSER-ONLY. Reads the session from the browser Supabase client (which uses
+// cookies via @supabase/ssr). Attaches the user's JWT, handles 401-with-
+// refresh, parses sanitized errors, and returns a typed result.
 //
-// Two consumers:
+// For Server Actions, Route Handlers, or Server Components calling an edge
+// function, use `serverApiCall` from `./serverApiClient.ts` instead — it
+// reads the session via Next.js `cookies()` rather than the browser store.
+// Calling `apiCall` server-side throws because there is no browser session
+// to read.
+//
+// Two browser consumers:
 //   1. Service layer (`src/lib/services/*`) calls this when an operation
 //      requires server-side computation, third-party API access, or
 //      service_role privileges (those live in the edge function).
@@ -15,7 +20,7 @@
 //      Actions or Service-layer wrappers.
 // =============================================================================
 
-import { supabase } from "./supabaseClient";
+import { createClient } from "./supabaseClient";
 
 export interface ApiSuccess<T> {
   data: T;
@@ -61,11 +66,21 @@ interface ApiCallOptions {
  *     return apiCall<{ id: string }>("rcv_create_recipe", { body: input });
  *   }
  */
-export async function apiCall<T>(
+export async function browserApiCall<T>(
   functionName: string,
   options: ApiCallOptions = {}
 ): Promise<ApiResult<T>> {
+  if (typeof window === "undefined") {
+    throw new Error(
+      "browserApiCall is browser-only. From Server Actions, Route Handlers, " +
+        "or Server Components, use `serverApiCall` from " +
+        "`@/lib/serverApiClient` instead — it reads the session via " +
+        "next/headers cookies rather than the browser store."
+    );
+  }
+
   const { method = "POST", body, headers: extraHeaders = {}, signal } = options;
+  const supabase = createClient();
 
   const buildHeaders = async (): Promise<Record<string, string>> => {
     const { data } = await supabase.auth.getSession();
@@ -77,7 +92,7 @@ export async function apiCall<T>(
     };
   };
 
-  const projectUrl = supabase.supabaseUrl ?? "";
+  const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const url = `${projectUrl}/functions/v1/${functionName}`;
 
   const doFetch = async (): Promise<Response> => {
@@ -159,3 +174,17 @@ export async function apiCall<T>(
 
   return { data: parsed as T, error: null };
 }
+
+/**
+ * Backwards-compat alias for `browserApiCall`. New code should import
+ * `browserApiCall` directly so the browser-only constraint is visible at
+ * the call site. Both names enforce the same runtime check, so server-side
+ * imports fail loudly with a redirect to `serverApiCall`.
+ */
+export function apiCall<T>(
+  functionName: string,
+  options: ApiCallOptions = {}
+): Promise<ApiResult<T>> {
+  return browserApiCall<T>(functionName, options);
+}
+

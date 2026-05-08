@@ -25,11 +25,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Resolved at runtime from the RATE_LIMITS_TABLE env var so this file is
 // PROJECT-AGNOSTIC. The Seed generator creates `<slug>_rate_limits` and
 // claude.md Setup Sequence exports `RATE_LIMITS_TABLE=<slug>_rate_limits`
-// alongside the standard Supabase secrets. Fallback `"rate_limits"` is the
-// pre-prefix legacy name — only used if the env var was forgotten, and
-// every call will fail-open with a console.warn pointing here.
-const RATE_LIMITS_TABLE =
-  Deno.env.get("RATE_LIMITS_TABLE") ?? "rate_limits";
+// alongside the standard Supabase secrets.
+//
+// Fail loud on missing env var — silent fail-open is a security bug. If
+// `RATE_LIMITS_TABLE` is unset and we defaulted to "rate_limits", a
+// prefixed project would write to a nonexistent table, every check would
+// silently fail-open, and rate limiting would be bypassed entirely. The
+// edge function deploy fails at startup instead, which is the desired
+// behavior — operators see the missing secret immediately.
+const RATE_LIMITS_TABLE = Deno.env.get("RATE_LIMITS_TABLE");
+if (!RATE_LIMITS_TABLE) {
+  throw new Error(
+    "RATE_LIMITS_TABLE env var is required. Set it via " +
+      "`supabase secrets set RATE_LIMITS_TABLE=<prefix>_rate_limits` " +
+      "before deploying any edge function."
+  );
+}
 
 export type RateLimitTier = "auth" | "read" | "write" | "expensive";
 
