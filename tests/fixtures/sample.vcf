@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Aisha Patel
+N:Patel;Aisha;;;
+EMAIL;TYPE=INTERNET:aisha@example.com
+TEL;TYPE=CELL:+1-555-0142
+ORG:Example Workspace
+TITLE:Owner
+END:VCARD

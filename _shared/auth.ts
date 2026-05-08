@@ -3,9 +3,16 @@
 // =============================================================================
 // Every edge function MUST call requireAuth() before any data access.
 // Identity is ALWAYS derived from the JWT. Never from request body/query.
+//
+// Every error Response built here MUST include corsHeaders(req). A 401 or
+// 403 without CORS shows up in the browser as an opaque "Network Error" —
+// the actual status code is invisible to the caller, which destroys hours
+// of debugging time per build. If you add a new error path, attach
+// corsHeaders.
 // =============================================================================
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsHeaders } from "./cors.ts";
 
 export interface AuthenticatedUser {
   id: string;
@@ -33,7 +40,7 @@ export async function requireAuth(
       null,
       new Response(JSON.stringify({ error: "Missing or invalid authorization header" }), {
         status: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }),
     ];
   }
@@ -60,7 +67,7 @@ export async function requireAuth(
       null,
       new Response(JSON.stringify({ error: "Invalid or expired token" }), {
         status: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders(req), "Content-Type": "application/json" },
       }),
     ];
   }

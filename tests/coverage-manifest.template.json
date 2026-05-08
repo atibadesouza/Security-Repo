@@ -1,0 +1,63 @@
+{
+  "$schema_note": "Coverage manifest template. Phase 0 copies this to tests/coverage-manifest.json. Phase 1 expands it as feature P0 stories are implemented. verify-test-coverage.mjs reads the LIVE manifest (tests/coverage-manifest.json), not this template.",
+  "generated_at": "REPLACE_WITH_PROJECT_GENERATION_DATE",
+  "prd_version": "REPLACE_WITH_PRD_VERSION",
+  "specs": [
+    {
+      "story_id": "US-001",
+      "story_title": "Sign in with email and password",
+      "spec_file": "tests/e2e/auth/auth-flow.spec.ts",
+      "category": "auth",
+      "required": true
+    },
+    {
+      "story_id": "US-001b",
+      "story_title": "Sign in with invalid credentials shows inline error",
+      "spec_file": "tests/e2e/auth/auth-flow.spec.ts",
+      "category": "auth",
+      "required": true
+    },
+    {
+      "story_id": "US-002",
+      "story_title": "Sign out clears session and redirects unauthenticated requests",
+      "spec_file": "tests/e2e/auth/auth-flow.spec.ts",
+      "category": "auth",
+      "required": true
+    },
+    {
+      "story_id": "US-003",
+      "story_title": "Forgot password — request reset (no email enumeration)",
+      "spec_file": "tests/e2e/auth/auth-flow.spec.ts",
+      "category": "auth",
+      "required": true
+    },
+    {
+      "story_id": "US-004",
+      "story_title": "Set new password from reset link",
+      "spec_file": "tests/e2e/auth/reset-password.spec.ts",
+      "category": "auth",
+      "required": false
+    },
+    {
+      "story_id": "US-005",
+      "story_title": "Change password while signed in (re-authenticates first)",
+      "spec_file": "tests/e2e/auth/change-password.spec.ts",
+      "category": "auth",
+      "required": false
+    },
+    {
+      "story_id": "US-007",
+      "story_title": "Delete account",
+      "spec_file": "tests/e2e/auth/delete-account.spec.ts",
+      "category": "auth",
+      "required": false
+    },
+    {
+      "story_id": "US-008",
+      "story_title": "Sign up — create account",
+      "spec_file": "tests/e2e/auth/sign-up.spec.ts",
+      "category": "auth",
+      "required": false
+    }
+  ]
+}
