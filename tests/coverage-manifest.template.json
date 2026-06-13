@@ -1,0 +1,13 @@
+{
+  "$comment": "Coverage manifest — the surfaces that MUST be tested before ship. verify-test-coverage.mjs checks each `match` string appears in some test file. Copy to tests/coverage-manifest.json and fill `required` from PRD §3 (tables), §5 (edge functions), and the golden-path UI flows. Replace [slug].",
+  "required": [
+    { "name": "auth: login flow", "match": "login" },
+    { "name": "auth: signup flow", "match": "signup" },
+    { "name": "auth: account deletion", "match": "delete" },
+    { "name": "isolation: user A cannot read user B", "match": "cross-user" },
+    { "name": "[slug] core table: RLS isolation", "match": "[slug]_" },
+    { "name": "edge function: rejects missing JWT (401)", "match": "401" },
+    { "name": "edge function: rejects invalid body (400)", "match": "validation" },
+    { "name": "rate limit: 429 after threshold", "match": "429" }
+  ]
+}
